@@ -1,0 +1,35 @@
+buildscript {
+  repositories {
+    jcenter()
+  } 
+  dependencies {
+    classpath 'io.ratpack:ratpack-gradle:1.1.1'
+    classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.2'
+  }
+}
+
+apply plugin: 'io.ratpack.ratpack-groovy'
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'idea'
+
+repositories {
+  jcenter()
+}
+
+dependencies {
+
+  compile ratpack.dependency('rx')
+
+  compile 'org.mongodb:mongo-java-driver:3.2.0'
+  compile 'org.mongodb:mongodb-driver-rx:1.2.0'
+  compile 'biz.paluch.redis:lettuce:4.0.2.Final'
+
+  runtime 'org.apache.logging.log4j:log4j-slf4j-impl:2.2'
+  runtime 'org.apache.logging.log4j:log4j-api:2.2'
+  runtime 'org.apache.logging.log4j:log4j-core:2.2'
+  runtime 'com.lmax:disruptor:3.3.0'
+
+  testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+  testCompile 'com.github.kstyrc:embedded-redis:0.6'
+  testCompile 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:1.50.0'
+}

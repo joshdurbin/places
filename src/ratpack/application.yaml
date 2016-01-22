@@ -1,0 +1,11 @@
+redis:
+  uri: redis://localhost
+  geoSetKey: places
+mongo:
+  collection: places
+  db: places
+  uri: mongodb://localhost/places
+global:
+  defaultSearchRadius: 1
+  maxAllowableSearchRadius: 10000
+  resultSetSize: 100
