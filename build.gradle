@@ -20,6 +20,8 @@ dependencies {
 
   compile ratpack.dependency('rx')
 
+  compile 'com.rethinkdb:rethinkdb-driver:2.2-beta-1'
+  compile 'org.elasticsearch:elasticsearch:2.1.1'
   compile 'org.mongodb:mongo-java-driver:3.2.0'
   compile 'org.mongodb:mongodb-driver-rx:1.2.0'
   compile 'biz.paluch.redis:lettuce:4.0.2.Final'

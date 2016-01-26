@@ -4,6 +4,7 @@ import com.google.inject.Inject
 import com.google.inject.Singleton
 import com.lambdaworks.redis.GeoCoordinates
 import com.lambdaworks.redis.GeoWithin
+import com.mongodb.client.model.IndexOptions
 import com.mongodb.rx.client.MongoDatabase
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -78,5 +79,12 @@ class MongoPlaceService implements PlaceService {
       new GeoWithin<Place>(new Place(), 0.0 as Double, 0L, new GeoCoordinates(123, 456))
     } as Func1)
     .bindExec()
+  }
+
+  @Override
+  void prepareDatastore() {
+
+    mongoDatabase.getCollection(mongoConfig.collection)
+      .createIndex(null, new IndexOptions())
   }
 }

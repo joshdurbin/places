@@ -5,6 +5,7 @@ import com.google.inject.Provides
 import com.google.inject.Singleton
 import com.lambdaworks.redis.RedisClient
 import com.lambdaworks.redis.api.rx.RedisReactiveCommands
+import com.lambdaworks.redis.codec.CompressionCodec
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClient
 import com.mongodb.async.client.MongoClientSettings
@@ -15,19 +16,28 @@ import com.mongodb.connection.SocketSettings
 import com.mongodb.connection.SslSettings
 import com.mongodb.rx.client.MongoClients
 import com.mongodb.rx.client.MongoDatabase
+import com.rethinkdb.RethinkDB
+import com.rethinkdb.net.Connection
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import io.durbs.places.chain.PlacesAddRemoveOperationsChain
+import io.durbs.places.chain.PlaceInsertionChain
 import io.durbs.places.chain.PlacesQueryOperationsChain
 import io.durbs.places.codec.MongoPlaceCodec
 import io.durbs.places.codec.RedisPlaceCodec
+import io.durbs.places.config.ElasticsearchConfig
 import io.durbs.places.config.MongoConfig
 import io.durbs.places.config.RedisConfig
+import io.durbs.places.config.RethinkConfig
 import io.durbs.places.domain.Place
+import io.durbs.places.service.impl.ElasticsearchPlaceService
 import io.durbs.places.service.impl.MongoPlaceService
 import io.durbs.places.service.impl.RedisPlaceService
+import io.durbs.places.service.impl.RethinkPlaceService
 import org.bson.codecs.configuration.CodecRegistries
 import org.bson.codecs.configuration.CodecRegistry
+import org.elasticsearch.client.Client
+import org.elasticsearch.client.transport.TransportClient
+import org.elasticsearch.common.transport.InetSocketTransportAddress
 
 @CompileStatic
 @Slf4j
@@ -38,15 +48,43 @@ class PlacesModule extends AbstractModule {
 
     bind(MongoPlaceService)
     bind(RedisPlaceService)
-    bind(PlacesAddRemoveOperationsChain)
+    bind(RethinkPlaceService)
+    bind(ElasticsearchPlaceService)
+    bind(PlaceInsertionChain)
     bind(PlacesQueryOperationsChain)
   }
 
   @Provides
   @Singleton
-  RedisReactiveCommands<String, Place> provideRedisClient(RedisConfig redisConfig) {
+  Client provideElasticSearchClient(ElasticsearchConfig elasticsearchConfig) {
 
-    RedisClient.create(redisConfig.uri).connect(new RedisPlaceCodec()).reactive()
+    TransportClient.builder().build()
+      .addTransportAddress(
+      new InetSocketTransportAddress(InetAddress.getByName(elasticsearchConfig.hostname), elasticsearchConfig.hostport))
+  }
+
+  @Provides
+  @Singleton
+  RethinkDB provideRethinkDBSingleton() {
+    RethinkDB.r
+  }
+
+  @Provides
+  @Singleton
+  Connection.Builder provideRethinkConnectionBuilder(RethinkConfig rethinkConfig) {
+
+    Connection.build().hostname(rethinkConfig.hostname).port(rethinkConfig.port).db(rethinkConfig.db)
+  }
+
+  @Provides
+  @Singleton
+  RedisReactiveCommands<String, Place> compressedCodecCommands(RedisConfig redisConfig) {
+
+    RedisClient.create(redisConfig.uri).connect(
+      CompressionCodec.valueCompressor(
+        new RedisPlaceCodec(),
+        CompressionCodec.CompressionType.GZIP)
+    ).reactive()
   }
 
   @Provides

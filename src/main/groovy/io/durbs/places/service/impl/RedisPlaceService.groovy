@@ -20,7 +20,7 @@ import rx.functions.Func1
 class RedisPlaceService implements PlaceService {
 
   @Inject
-  RedisReactiveCommands<String, Place> geoCommands
+  RedisReactiveCommands<String, Place> redisPlaceCommands
 
   @Inject
   RedisConfig redisConfig
@@ -31,7 +31,7 @@ class RedisPlaceService implements PlaceService {
   @Override
   Observable<Integer> insertPlace(final Place place) {
 
-    geoCommands.geoadd(redisConfig.geoSetKey, place.longitude, place.latitude, place)
+    redisPlaceCommands.geoadd(redisConfig.geoSetKey, place.longitude, place.latitude, place)
       .map({ final Long insertionCount ->
 
       insertionCount.intValue()
@@ -41,7 +41,7 @@ class RedisPlaceService implements PlaceService {
   @Override
   Observable<Place> getPlaces(final Double latitude, final Double longitude, final Double searchRadius) {
 
-    geoCommands.georadius(redisConfig.geoSetKey,
+    redisPlaceCommands.georadius(redisConfig.geoSetKey,
       longitude,
       latitude,
       searchRadius,
@@ -57,7 +57,7 @@ class RedisPlaceService implements PlaceService {
   @Override
   Observable<GeoWithin<Place>> getPlacesWithDistance(final Double latitude, final Double longitude, final Double searchRadius) {
 
-    geoCommands.georadius(redisConfig.geoSetKey,
+    redisPlaceCommands.georadius(redisConfig.geoSetKey,
       longitude,
       latitude,
       searchRadius,
@@ -67,5 +67,10 @@ class RedisPlaceService implements PlaceService {
         .withCoordinates()
         .withDistance()
     ).bindExec()
+  }
+
+  @Override
+  void prepareDatastore() {
+
   }
 }
