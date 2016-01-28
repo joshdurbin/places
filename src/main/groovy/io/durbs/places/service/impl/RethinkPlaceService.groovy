@@ -18,8 +18,8 @@ import rx.Observable
 import rx.functions.Func1
 
 @Singleton
-@Slf4j
 @CompileStatic
+@Slf4j
 class RethinkPlaceService implements PlaceService {
 
   @Inject
@@ -32,15 +32,22 @@ class RethinkPlaceService implements PlaceService {
   RethinkConfig rethinkConfig
 
   @Override
-  Observable<Integer> insertPlace(Place place) {
+  Observable<Integer> insertPlace(final Place place) {
 
     Blocking.get {
 
-      final Connection connection = connectionBuilder.connect()
+      final Connection connection
+      final Map<String, String> operationResult
 
-      final Map<String, String> operationResult = RethinkConversionFunctions.CREATE_INSERT_COMMAND_FOR_PLACE(rethinkDB, place).run(connection) as Map
+      try {
 
-      connection.close()
+        connection = connectionBuilder.connect()
+        operationResult = RethinkConversionFunctions.CREATE_INSERT_COMMAND_FOR_PLACE(rethinkDB, place).run(connection) as Map
+
+      } finally {
+
+        connection?.close()
+      }
 
       operationResult.get('inserted') as Integer
 
@@ -48,7 +55,7 @@ class RethinkPlaceService implements PlaceService {
   }
 
   @Override
-  Observable<Place> getPlaces(Double latitude, Double longitude, Double searchRadius) {
+  Observable<Place> getPlaces(final Double latitude, final Double longitude, final Double searchRadius) {
 
     final GetNearest getNearestCommand = rethinkDB.table('places')
       .getNearest(rethinkDB.point(longitude, latitude))
@@ -57,10 +64,18 @@ class RethinkPlaceService implements PlaceService {
 
     Blocking.get {
 
-      final Connection connection = connectionBuilder.connect()
-      final List result = getNearestCommand.run(connection) as List
+      final Connection connection
+      final List result
 
-      connection.close()
+      try {
+
+        connection = connectionBuilder.connect()
+        result = getNearestCommand.run(connection) as List
+
+      } finally {
+
+        connection?.close()
+      }
 
       result
     }
@@ -69,7 +84,7 @@ class RethinkPlaceService implements PlaceService {
   }
 
   @Override
-  Observable<GeoWithin<Place>> getPlacesWithDistance(Double latitude, Double longitude, Double searchRadius) {
+  Observable<GeoWithin<Place>> getPlacesWithDistance(final Double latitude, final Double longitude, final Double searchRadius) {
 
     getPlaces(latitude, longitude, searchRadius)
       .map({Place place ->
@@ -108,9 +123,7 @@ class RethinkPlaceService implements PlaceService {
 
     } finally {
 
-      if (connection) {
-        connection.close()
-      }
+      connection?.close()
     }
   }
 }

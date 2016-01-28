@@ -8,6 +8,9 @@ import io.durbs.places.domain.Place
 import io.durbs.places.service.PlaceService
 import ratpack.groovy.handling.GroovyChainAction
 import ratpack.jackson.Jackson
+import rx.functions.Func1
+
+import static ratpack.jackson.Jackson.fromJson
 
 @Singleton
 class PlacesQueryOperationsChain extends GroovyChainAction {
@@ -17,6 +20,22 @@ class PlacesQueryOperationsChain extends GroovyChainAction {
 
   @Override
   void execute() throws Exception {
+
+    post { PlaceService placeService ->
+
+      parse(fromJson(Place))
+        .observe()
+        .flatMap ({ final Place place ->
+
+        placeService.insertPlace(place)
+
+      } as Func1)
+        .single()
+        .subscribe { final Integer numberOfInserts ->
+
+        render Jackson.json(numberOfInserts)
+      }
+    }
 
     get(':latitude/:longitude/:radius') { PlaceService placeService ->
 
