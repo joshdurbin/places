@@ -24,7 +24,7 @@ dependencies {
   compile 'org.elasticsearch:elasticsearch:2.1.1'
   compile 'org.mongodb:mongo-java-driver:3.2.0'
   compile 'org.mongodb:mongodb-driver-rx:1.2.0'
-  compile 'biz.paluch.redis:lettuce:4.0.2.Final'
+  compile 'biz.paluch.redis:lettuce:4.1.Final'
 
   runtime 'org.apache.logging.log4j:log4j-slf4j-impl:2.2'
   runtime 'org.apache.logging.log4j:log4j-api:2.2'

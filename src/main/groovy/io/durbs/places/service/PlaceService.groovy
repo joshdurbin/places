@@ -31,8 +31,4 @@ interface PlaceService {
    */
   Observable<GeoWithin<Place>> getPlacesWithDistance(Double latitude, Double longitude, Double searchRadius)
 
-  /**
-   *
-   */
-  void prepareDatastore()
 }

@@ -1,8 +1,9 @@
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.durbs.places.PlacesModule
-import io.durbs.places.chain.PlaceInsertionChain
+
 import io.durbs.places.chain.PlacesQueryOperationsChain
+
 import io.durbs.places.config.ElasticsearchConfig
 import io.durbs.places.config.GlobalConfig
 import io.durbs.places.config.MongoConfig
@@ -47,20 +48,11 @@ ratpack {
       void onStart(StartEvent event) throws Exception {
 
         RxRatpack.initialize()
-
-        event.registry.get(ElasticsearchPlaceService).prepareDatastore()
-        event.registry.get(MongoPlaceService).prepareDatastore()
-        event.registry.get(RedisPlaceService).prepareDatastore()
-        event.registry.get(RethinkPlaceService).prepareDatastore()
       }
     }
   }
 
   handlers {
-
-    prefix('insert') {
-      all chain(registry.get(PlaceInsertionChain))
-    }
 
     prefix('elastic') {
       all { next(single(PlaceService, get(ElasticsearchPlaceService))) }

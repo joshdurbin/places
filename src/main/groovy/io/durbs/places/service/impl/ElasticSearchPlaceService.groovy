@@ -14,6 +14,8 @@ import org.elasticsearch.action.index.IndexResponse
 import org.elasticsearch.action.search.SearchRequest
 import org.elasticsearch.action.search.SearchResponse
 import org.elasticsearch.client.Client
+import org.elasticsearch.client.transport.TransportClient
+import org.elasticsearch.common.transport.InetSocketTransportAddress
 import rx.Observable
 import rx.functions.Func1
 
@@ -22,11 +24,18 @@ import rx.functions.Func1
 @Slf4j
 class ElasticsearchPlaceService implements PlaceService {
 
-  @Inject
-  Client elasticSearchClient
+  final ElasticsearchConfig elasticsearchConfig
+  final Client elasticSearchClient
 
   @Inject
-  ElasticsearchConfig elasticsearchConfig
+  ElasticsearchPlaceService(ElasticsearchConfig elasticsearchConfig) {
+
+    this.elasticsearchConfig = elasticsearchConfig
+
+    elasticSearchClient = TransportClient.builder().build()
+      .addTransportAddress(
+      new InetSocketTransportAddress(InetAddress.getByName(elasticsearchConfig.hostname), elasticsearchConfig.hostport))
+  }
 
   @Override
   Observable<Integer> insertPlace(final Place place) {
@@ -56,8 +65,4 @@ class ElasticsearchPlaceService implements PlaceService {
     return null
   }
 
-  @Override
-  void prepareDatastore() {
-
-  }
 }

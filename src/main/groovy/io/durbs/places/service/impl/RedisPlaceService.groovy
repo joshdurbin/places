@@ -4,9 +4,12 @@ import com.google.inject.Inject
 import com.google.inject.Singleton
 import com.lambdaworks.redis.GeoArgs
 import com.lambdaworks.redis.GeoWithin
+import com.lambdaworks.redis.RedisClient
 import com.lambdaworks.redis.api.rx.RedisReactiveCommands
+import com.lambdaworks.redis.codec.CompressionCodec
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import io.durbs.places.codec.RedisPlaceCodec
 import io.durbs.places.config.GlobalConfig
 import io.durbs.places.config.RedisConfig
 import io.durbs.places.domain.Place
@@ -19,14 +22,22 @@ import rx.functions.Func1
 @Slf4j
 class RedisPlaceService implements PlaceService {
 
-  @Inject
-  RedisReactiveCommands<String, Place> redisPlaceCommands
+  final RedisConfig redisConfig
+  final GlobalConfig globalConfig
+  final RedisReactiveCommands<String, Place> redisPlaceCommands
 
   @Inject
-  RedisConfig redisConfig
+  RedisPlaceService(RedisConfig redisConfig, GlobalConfig globalConfig) {
 
-  @Inject
-  GlobalConfig globalConfig
+    this.redisConfig = redisConfig
+    this.globalConfig = globalConfig
+
+    redisPlaceCommands = RedisClient.create(redisConfig.uri).connect(
+      CompressionCodec.valueCompressor(
+        new RedisPlaceCodec(),
+        CompressionCodec.CompressionType.GZIP)
+    ).reactive()
+  }
 
   @Override
   Observable<Integer> insertPlace(final Place place) {
@@ -69,8 +80,4 @@ class RedisPlaceService implements PlaceService {
     ).bindExec()
   }
 
-  @Override
-  void prepareDatastore() {
-
-  }
 }
