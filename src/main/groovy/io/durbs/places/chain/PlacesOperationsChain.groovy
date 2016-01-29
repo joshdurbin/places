@@ -13,7 +13,7 @@ import rx.functions.Func1
 import static ratpack.jackson.Jackson.fromJson
 
 @Singleton
-class PlacesQueryOperationsChain extends GroovyChainAction {
+class PlacesOperationsChain extends GroovyChainAction {
 
   @Inject
   GlobalConfig globalConfig

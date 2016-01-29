@@ -2,7 +2,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.durbs.places.PlacesModule
 
-import io.durbs.places.chain.PlacesQueryOperationsChain
+import io.durbs.places.chain.PlacesOperationsChain
 
 import io.durbs.places.config.ElasticsearchConfig
 import io.durbs.places.config.GlobalConfig
@@ -16,13 +16,13 @@ import io.durbs.places.service.impl.RedisPlaceService
 import io.durbs.places.service.impl.RethinkPlaceService
 import ratpack.config.ConfigData
 import ratpack.rx.RxRatpack
-import ratpack.server.Service
-import ratpack.server.StartEvent
 
 import static ratpack.groovy.Groovy.ratpack
 
 ratpack {
   bindings {
+
+    RxRatpack.initialize()
 
     ConfigData configData = ConfigData.of { c ->
       c.yaml("$serverConfig.baseDir.file/application.yaml")
@@ -41,37 +41,28 @@ ratpack {
       .setSerializationInclusion(JsonInclude.Include.NON_EMPTY))
 
     module PlacesModule
-
-    bindInstance Service, new Service() {
-
-      @Override
-      void onStart(StartEvent event) throws Exception {
-
-        RxRatpack.initialize()
-      }
-    }
   }
 
   handlers {
 
     prefix('elastic') {
       all { next(single(PlaceService, get(ElasticsearchPlaceService))) }
-      all chain(registry.get(PlacesQueryOperationsChain))
+      all chain(registry.get(PlacesOperationsChain))
     }
 
     prefix('mongo') {
       all { next(single(PlaceService, get(MongoPlaceService))) }
-      all chain(registry.get(PlacesQueryOperationsChain))
+      all chain(registry.get(PlacesOperationsChain))
     }
 
     prefix('redis') {
       all { next(single(PlaceService, get(RedisPlaceService))) }
-      all chain(registry.get(PlacesQueryOperationsChain))
+      all chain(registry.get(PlacesOperationsChain))
     }
 
     prefix('rethink') {
       all { next(single(PlaceService, get(RethinkPlaceService))) }
-      all chain(registry.get(PlacesQueryOperationsChain))
+      all chain(registry.get(PlacesOperationsChain))
     }
 
   }

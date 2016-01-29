@@ -5,7 +5,7 @@ import com.google.inject.AbstractModule
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import io.durbs.places.chain.PlacesQueryOperationsChain
+import io.durbs.places.chain.PlacesOperationsChain
 import io.durbs.places.service.impl.ElasticsearchPlaceService
 import io.durbs.places.service.impl.MongoPlaceService
 import io.durbs.places.service.impl.RedisPlaceService
@@ -22,7 +22,7 @@ class PlacesModule extends AbstractModule {
     bind(RedisPlaceService)
     bind(RethinkPlaceService)
     bind(ElasticsearchPlaceService)
-    bind(PlacesQueryOperationsChain)
+    bind(PlacesOperationsChain)
   }
 
 }
