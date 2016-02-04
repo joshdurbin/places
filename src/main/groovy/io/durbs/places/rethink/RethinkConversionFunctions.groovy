@@ -1,8 +1,8 @@
-package io.durbs.places.codec
+package io.durbs.places.rethink
 
 import com.rethinkdb.RethinkDB
 import com.rethinkdb.gen.ast.Insert
-import io.durbs.places.domain.Place
+import io.durbs.places.Place
 import rx.functions.Func1
 
 @Singleton

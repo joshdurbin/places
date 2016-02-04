@@ -1,21 +1,22 @@
-redis:
-  uri: redis://localhost
-  geoSetKey: places
-mongo:
-  collection: places
-  db: places
-  uri: mongodb://localhost/places
-rethink:
-  hostname: localhost
-  port: 28015
-  db: places
-  table: places
 elastic:
   hostname: localhost
   hostport: 9300
   index: places
   type: place
+mongo:
+  collection: places
+  db: places
+  uri: mongodb://localhost/places
+redis:
+  uri: redis://localhost
+  geoSetKey: places
+rethink:
+  hostname: localhost
+  port: 28015
+  db: places
+  table: places
 global:
   defaultSearchRadius: 1
   maxAllowableSearchRadius: 10000
   resultSetSize: 100
+  datastoreTarget: mongo

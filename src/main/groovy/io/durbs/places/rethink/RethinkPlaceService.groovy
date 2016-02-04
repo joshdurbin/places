@@ -1,4 +1,4 @@
-package io.durbs.places.service.impl
+package io.durbs.places.rethink
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
@@ -9,10 +9,8 @@ import com.rethinkdb.gen.ast.GetNearest
 import com.rethinkdb.net.Connection
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import io.durbs.places.codec.RethinkConversionFunctions
-import io.durbs.places.config.RethinkConfig
-import io.durbs.places.domain.Place
-import io.durbs.places.service.PlaceService
+import io.durbs.places.Place
+import io.durbs.places.PlaceService
 import ratpack.exec.Blocking
 import rx.Observable
 import rx.functions.Func1
@@ -22,47 +20,11 @@ import rx.functions.Func1
 @Slf4j
 class RethinkPlaceService implements PlaceService {
 
-  final RethinkConfig rethinkConfig
-  final Connection.Builder connectionBuilder
-  final RethinkDB rethinkDB
+  @Inject
+  Connection.Builder connectionBuilder
 
   @Inject
-  RethinkPlaceService(RethinkConfig rethinkConfig) {
-
-    this.rethinkConfig = rethinkConfig
-
-    connectionBuilder = Connection.build().hostname(rethinkConfig.hostname).port(rethinkConfig.port).db(rethinkConfig.db)
-    rethinkDB = RethinkDB.r
-
-    final Connection connection
-
-    try {
-
-      connection = connectionBuilder.connect()
-
-      if (!(rethinkDB.dbList().run(connection) as List<String>).contains(rethinkConfig.db)) {
-
-        log.info("Creating Rethink DB '${rethinkConfig.db}'")
-        rethinkDB.dbCreate(rethinkConfig.db).run(connection)
-      }
-
-      if (!(rethinkDB.db(rethinkConfig.db).tableList().run(connection) as List<String>).contains(rethinkConfig.table)) {
-
-        log.info("Creating Rethink table '${rethinkConfig.table}' in DB '${rethinkConfig.db}'")
-        rethinkDB.db(rethinkConfig.db).tableCreate(rethinkConfig.table).run(connection)
-      }
-
-      if (!(rethinkDB.db(rethinkConfig.db).table(rethinkConfig.table).indexList().run(connection) as List<String>).contains('location')) {
-
-        log.info("Creating Rethink index 'location' in table '${rethinkConfig.table}' in DB '${rethinkConfig.db}'")
-        rethinkDB.db(rethinkConfig.db).table(rethinkConfig.table).indexCreate('location').optArg('geo', true).run(connection)
-      }
-
-    } finally {
-
-      connection?.close()
-    }
-  }
+  RethinkDB rethinkDB
 
   @Override
   Observable<Integer> insertPlace(final Place place) {

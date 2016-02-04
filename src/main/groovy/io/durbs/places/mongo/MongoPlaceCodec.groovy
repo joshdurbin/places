@@ -1,6 +1,6 @@
-package io.durbs.places.codec
+package io.durbs.places.mongo
 
-import io.durbs.places.domain.Place
+import io.durbs.places.Place
 import org.bson.BsonReader
 import org.bson.BsonString
 import org.bson.BsonValue

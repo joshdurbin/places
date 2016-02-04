@@ -1,6 +1,6 @@
-package io.durbs.places.codec
+package io.durbs.places.elasticsearch
 
-import io.durbs.places.domain.Place
+import io.durbs.places.Place
 import org.elasticsearch.common.xcontent.XContentBuilder
 import org.elasticsearch.search.SearchHit
 import rx.functions.Func1

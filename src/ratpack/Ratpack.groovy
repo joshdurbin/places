@@ -1,19 +1,11 @@
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.durbs.places.PlacesModule
-
-import io.durbs.places.chain.PlacesOperationsChain
-
-import io.durbs.places.config.ElasticsearchConfig
-import io.durbs.places.config.GlobalConfig
-import io.durbs.places.config.MongoConfig
-import io.durbs.places.config.RedisConfig
-import io.durbs.places.config.RethinkConfig
-import io.durbs.places.service.PlaceService
-import io.durbs.places.service.impl.ElasticsearchPlaceService
-import io.durbs.places.service.impl.MongoPlaceService
-import io.durbs.places.service.impl.RedisPlaceService
-import io.durbs.places.service.impl.RethinkPlaceService
+import io.durbs.places.RESTChain
+import io.durbs.places.GlobalConfig
+import io.durbs.places.elasticsearch.ElasticsearchModule
+import io.durbs.places.mongo.MongoModule
+import io.durbs.places.redis.RedisModule
+import io.durbs.places.rethink.RethinkModule
 import ratpack.config.ConfigData
 import ratpack.rx.RxRatpack
 
@@ -24,46 +16,39 @@ ratpack {
 
     RxRatpack.initialize()
 
-    ConfigData configData = ConfigData.of { c ->
+    // READ CONFIG DATA AND PLACE IN GUICE
+    final ConfigData configData = ConfigData.of { c ->
       c.yaml("$serverConfig.baseDir.file/application.yaml")
       c.env()
       c.sysProps()
     }
+    bindInstance(ConfigData, configData)
+    
+    // LOCAL GLOBAL CONFIG USED FOR MODULE LOADING BELOW
+    final GlobalConfig globalConfig = configData.get(GlobalConfig.CONFIG_ROOT, GlobalConfig)
+    bindInstance(GlobalConfig, globalConfig)
 
-    bindInstance(ElasticsearchConfig, configData.get('/elastic', ElasticsearchConfig))
-    bindInstance(RethinkConfig, configData.get('/rethink', RethinkConfig))
-    bindInstance(MongoConfig, configData.get('/mongo', MongoConfig))
-    bindInstance(RedisConfig, configData.get('/redis', RedisConfig))
-    bindInstance(GlobalConfig, configData.get('/global', GlobalConfig))
+    if (globalConfig.datastoreTarget == GlobalConfig.Datastore.rethink) {
+      module RethinkModule
+    } else if (globalConfig.datastoreTarget == GlobalConfig.Datastore.elasticsearch) {
+      module ElasticsearchModule
+    } else if (globalConfig.datastoreTarget == GlobalConfig.Datastore.mongo) {
+      module MongoModule
+    } else if (globalConfig.datastoreTarget == GlobalConfig.Datastore.redis) {
+      module RedisModule
+    }
 
+    // BIND JACKSON OBJECT MAPPER THAT IGNORES NULL AND EMPTY VALUES
     bindInstance(ObjectMapper, new ObjectMapper()
       .setSerializationInclusion(JsonInclude.Include.NON_NULL)
       .setSerializationInclusion(JsonInclude.Include.NON_EMPTY))
-
-    module PlacesModule
   }
 
   handlers {
 
-    prefix('elastic') {
-      all { next(single(PlaceService, get(ElasticsearchPlaceService))) }
-      all chain(registry.get(PlacesOperationsChain))
+    // PASS ALL HTTP TRAFFIC TO THE OPERATIONS CHAIN
+    prefix('places') {
+      all chain(registry.get(RESTChain))
     }
-
-    prefix('mongo') {
-      all { next(single(PlaceService, get(MongoPlaceService))) }
-      all chain(registry.get(PlacesOperationsChain))
-    }
-
-    prefix('redis') {
-      all { next(single(PlaceService, get(RedisPlaceService))) }
-      all chain(registry.get(PlacesOperationsChain))
-    }
-
-    prefix('rethink') {
-      all { next(single(PlaceService, get(RethinkPlaceService))) }
-      all chain(registry.get(PlacesOperationsChain))
-    }
-
   }
 }

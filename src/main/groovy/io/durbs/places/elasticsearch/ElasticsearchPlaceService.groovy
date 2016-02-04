@@ -1,21 +1,17 @@
-package io.durbs.places.service.impl
+package io.durbs.places.elasticsearch
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import com.lambdaworks.redis.GeoWithin
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import io.durbs.places.codec.ElasticsearchConversionFunctions
-import io.durbs.places.config.ElasticsearchConfig
-import io.durbs.places.domain.Place
-import io.durbs.places.service.PlaceService
+import io.durbs.places.Place
+import io.durbs.places.PlaceService
 import org.elasticsearch.action.index.IndexRequest
 import org.elasticsearch.action.index.IndexResponse
 import org.elasticsearch.action.search.SearchRequest
 import org.elasticsearch.action.search.SearchResponse
 import org.elasticsearch.client.Client
-import org.elasticsearch.client.transport.TransportClient
-import org.elasticsearch.common.transport.InetSocketTransportAddress
 import rx.Observable
 import rx.functions.Func1
 
@@ -24,18 +20,11 @@ import rx.functions.Func1
 @Slf4j
 class ElasticsearchPlaceService implements PlaceService {
 
-  final ElasticsearchConfig elasticsearchConfig
-  final Client elasticSearchClient
+  @Inject
+  ElasticsearchConfig elasticsearchConfig
 
   @Inject
-  ElasticsearchPlaceService(ElasticsearchConfig elasticsearchConfig) {
-
-    this.elasticsearchConfig = elasticsearchConfig
-
-    elasticSearchClient = TransportClient.builder().build()
-      .addTransportAddress(
-      new InetSocketTransportAddress(InetAddress.getByName(elasticsearchConfig.hostname), elasticsearchConfig.hostport))
-  }
+  Client elasticSearchClient
 
   @Override
   Observable<Integer> insertPlace(final Place place) {

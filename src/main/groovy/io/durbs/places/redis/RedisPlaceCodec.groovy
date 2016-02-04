@@ -1,11 +1,11 @@
-package io.durbs.places.codec
+package io.durbs.places.redis
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Charsets
 import com.lambdaworks.redis.codec.RedisCodec
 import groovy.transform.CompileStatic
-import io.durbs.places.domain.Place
+import io.durbs.places.Place
 
 import java.nio.ByteBuffer
 

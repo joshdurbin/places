@@ -1,11 +1,9 @@
-package io.durbs.places.chain
+package io.durbs.places
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import com.lambdaworks.redis.GeoWithin
-import io.durbs.places.config.GlobalConfig
-import io.durbs.places.domain.Place
-import io.durbs.places.service.PlaceService
+import groovy.util.logging.Slf4j
 import ratpack.groovy.handling.GroovyChainAction
 import ratpack.jackson.Jackson
 import rx.functions.Func1
@@ -13,15 +11,19 @@ import rx.functions.Func1
 import static ratpack.jackson.Jackson.fromJson
 
 @Singleton
-class PlacesOperationsChain extends GroovyChainAction {
+@Slf4j
+class RESTChain extends GroovyChainAction {
 
   @Inject
   GlobalConfig globalConfig
 
+  @Inject
+  PlaceService placeService
+
   @Override
   void execute() throws Exception {
 
-    post { PlaceService placeService ->
+    post {
 
       parse(fromJson(Place))
         .observe()
@@ -37,7 +39,7 @@ class PlacesOperationsChain extends GroovyChainAction {
       }
     }
 
-    get(':latitude/:longitude/:radius') { PlaceService placeService ->
+    get(':latitude/:longitude/:radius') {
 
       final Double latitude = pathTokens['latitude'] as Double
       final Double longitude = pathTokens['longitude'] as Double

@@ -1,4 +1,4 @@
-package io.durbs.places.domain
+package io.durbs.places
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import groovy.transform.Canonical
