@@ -7,6 +7,14 @@ mongo:
   collection: places
   db: places
   uri: mongodb://localhost/places
+postgres:
+  dataSourceClassName: org.postgresql.ds.PGSimpleDataSource
+  username: postgres
+  password: password
+  dataSourceProperties:
+    databaseName: places
+    serverName: localhost
+    portNumber: 5432
 redis:
   uri: redis://localhost
   geoSetKey: places

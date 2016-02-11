@@ -20,6 +20,18 @@ dependencies {
 
   compile ratpack.dependency('rx')
 
+  // couchbase
+
+  // aws dynamodb, geo libs
+  compile fileTree(dir: 'libs', include: '*.jar')
+  compile 'com.amazonaws:aws-java-sdk-dynamodb:1.10.50'
+
+  // postgres
+  compile 'net.postgis:postgis-jdbc:2.2.0'
+  compile 'org.postgresql:postgresql:9.4.1207'
+  compile 'org.jooq:jooq:3.7.2'
+  compile ratpack.dependency('hikari')
+
   compile 'com.rethinkdb:rethinkdb-driver:2.2-beta-1'
   compile 'org.elasticsearch:elasticsearch:2.1.1'
   compile 'org.mongodb:mongo-java-driver:3.2.0'
