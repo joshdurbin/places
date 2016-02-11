@@ -2,17 +2,13 @@ def slurper = new groovy.json.JsonSlurper()
 
 def distanceOptionsInMeters = [25, 50, 100, 250, 500, 1000]
 
-def redisWriter = new File('bayareaplaces_redis_loadtest.txt').newWriter()
-def mongoWriter = new File('bayareaplaces_mongo_loadtest.txt').newWriter()
-def elasticWriter = new File('bayareaplaces_elastic_loadtest.txt').newWriter()
-def rethinkWriter = new File('bayareaplaces_rethink_loadtest.txt').newWriter()
+def queryLoadtestWriter = new File('places_query_loadtest_urls.txt').newWriter()
+def insertLoadtestWriter = new File('places_insert_loadtest_urls.txt').newWriter() 
 
 def baseURL = 'http://localhost:5050'
 
-redisWriter.writeLine("URL=${baseURL}/redis")
-mongoWriter.writeLine("URL=${baseURL}/mongo")
-elasticWriter.writeLine("URL=${baseURL}/elastic")
-rethinkWriter.writeLine("URL=${baseURL}/rethink")
+queryLoadtestWriter.writeLine("URL=${baseURL}/places")
+insertLoadtestWriter.writeLine("URL=${baseURL}/places")
 
 new File('bayareaplaces.json').eachLine { line ->
 
@@ -21,8 +17,8 @@ new File('bayareaplaces.json').eachLine { line ->
 
   def url = "\$(URL)/${json.latitude}/${json.longitude}/${distanceOptionsInMeters.get(random)}"
 
-  redisWriter.writeLine(url)
-  mongoWriter.writeLine(url)
-  elasticWriter.writeLine(url)
-  rethinkWriter.writeLine(url)
+  queryLoadtestWriter.writeLine(url)
+
+  // using this instead of something like -- awk '{print "$(URL) POST " $0}' bayareaplaces.json > places_insert_loadtest_urls.txt
+  insertLoadtestWriter.writeLine("\$(URL) POST ${line}")
 }
