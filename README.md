@@ -2,12 +2,12 @@ Places -- Geo Near Performance Tests
 -----------------------------
 
 This project intends to leverage the recommended implementation path for geospatial, "geo near" queries against a data set of
-places of interest (POIs) backed by various datastores. The test data set contains POIs only for the San Francisco Bay Area.
+places of interest (POIs) backed by various data stores. The test data set contains POIs only for the San Francisco Bay Area.
 The Ratpack and RxJava powered API allows for the insertion and query of POIs.
 
-POST operations to the `/places` end point insert a single record into the backing datastore (see below for an example record).
+POST operations to the `/places` end point insert a single record into the backing data store (see below for an example record).
 
-GET operations to `/places` w/ the point and radius information will query the backing datastore. The expected structure of the query
+GET operations to `/places` w/ the point and radius information will query the backing data store. The expected structure of the query
   endpoint is `/places/$latitude/$longitude/$radius` w/ a radius in meters.
 
 The available backing datastores are:
@@ -16,6 +16,18 @@ The available backing datastores are:
 2. Redis (3.2 beta)
 3. Elasticsearch
 4. RethinkDB
+
+-----------------------------
+
+Requirements:
+
+1. Install the latest version of Java 8 JDK
+2. Install the latest version of [Groovy](http://www.groovy-lang.org/)
+3. Install the latest version of [Gradle](http://gradle.org/)
+4. Install `[siege](https://www.joedog.org/siege-home/)`, a command line load testing tool.
+
+Note: Unless your OS has up-to-date packages for Groovy, Gradle, etc... I recommend installing Java 8 and leveraging [sdkman](http://sdkman.io/)
+for the installation of the other JVM-related tools.
 
 -----------------------------
 
@@ -54,14 +66,14 @@ Sample record:
 Load Test:
 
 The [data](https://github.com/joshdurbin/places/tree/data) branch also has a script, [GenerateLoadTestScripts.groovy](https://github.com/joshdurbin/places/blob/data/GenerateLoadTestScripts.groovy)
-which is capabale of reading the data set and generating two files:
+which is capable of reading the data set and generating two files:
 
 1. `places_query_loadtest_urls.txt` - represents a query matching each point (lat, long pair) in the original data set with
  a random distance of [25-50-100-250-500-100].
 2.  `places_insert_loadtest_urls.txt` - represents the actual record payloads for insertion to the API.
 
 These files are intended for consumption by [siege](https://www.joedog.org/siege-home/), a command line load testing
-application. It's straightforward usage is detailed below...
+tool. It's straightforward usage is detailed below...
 
 A sample query load test:
 
