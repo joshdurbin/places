@@ -10,7 +10,7 @@ POST operations to the `/places` end point insert a single record into the backi
 GET operations to `/places` w/ the point and radius information will query the backing data store. The expected structure of the query
   endpoint is `/places/$latitude/$longitude/$radius` w/ a radius in meters.
 
-The available backing datastores are:
+The available backing data stores are:
 
 1. Mongo
 2. Redis (3.2 beta)
@@ -24,7 +24,7 @@ Requirements:
 1. Install the latest version of Java 8 JDK
 2. Install the latest version of [Groovy](http://www.groovy-lang.org/)
 3. Install the latest version of [Gradle](http://gradle.org/)
-4. Install `[siege](https://www.joedog.org/siege-home/)`, a command line load testing tool.
+4. Install [siege](https://www.joedog.org/siege-home/), a command line load testing tool.
 
 Note: Unless your OS has up-to-date packages for Groovy, Gradle, etc... I recommend installing Java 8 and leveraging [sdkman](http://sdkman.io/)
 for the installation of the other JVM-related tools.
