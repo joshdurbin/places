@@ -1,4 +1,4 @@
-Places Near Geo Performance Tests
+Places -- Geo Near Performance Tests
 -----------------------------
 
 This project intends to leverage the recommended implementation path for geospatial, "geo near" queries against a data set of
@@ -16,17 +16,17 @@ The available backing datastores are:
 2. Redis (3.2 beta)
 3. Elasticsearch
 4. RethinkDB
-5. PostgreSQL w/postgis (coming, see [add-dynamo_postgis_couchbase](https://github.com/joshdurbin/bayarea-places/tree/add-dynamo_postgis_couchbase) branch)
-6. AWS DynamoDB (coming, see [add-dynamo_postgis_couchbase](https://github.com/joshdurbin/bayarea-places/tree/add-dynamo_postgis_couchbase) branch)
-7. Couchase (coming, see [add-dynamo_postgis_couchbase](https://github.com/joshdurbin/bayarea-places/tree/add-dynamo_postgis_couchbase) branch)
+5. PostgreSQL w/postgis (coming, see [add-dynamo_postgis_couchbase](https://github.com/joshdurbin/places/tree/add-dynamo_postgis_couchbase) branch)
+6. AWS DynamoDB (coming, see [add-dynamo_postgis_couchbase](https://github.com/joshdurbin/places/tree/add-dynamo_postgis_couchbase) branch)
+7. Couchase (coming, see [add-dynamo_postgis_couchbase](https://github.com/joshdurbin/places/tree/add-dynamo_postgis_couchbase) branch)
 
 -----------------------------
 
 Testing:
 
 All the aforementioned datastores are implemented and thus their dependencies are delivered, required for compilation. However, only one datastore service
-stack is loaded when the application loads. This is controlled by the [global:datastoreTarget](https://github.com/joshdurbin/places-near-geo-performance-tests/blob/master/src/ratpack/application.yaml) attribute in the shipped base
-config. Valid options for this config are in the `Datastore` enum found in the [GlobalConfig.groovy](https://github.com/joshdurbin/places-near-geo-performance-tests/blob/master/src/main/groovy/io/durbs/places/GlobalConfig.groovy) class.
+stack is loaded when the application loads. This is controlled by the [global:datastoreTarget](https://github.com/joshdurbin/places/blob/master/src/ratpack/application.yaml) attribute in the shipped base
+config. Valid options for this config are in the `Datastore` enum found in the [GlobalConfig.groovy](https://github.com/joshdurbin/places/blob/master/src/main/groovy/io/durbs/places/GlobalConfig.groovy) class.
 
 -----------------------------
 

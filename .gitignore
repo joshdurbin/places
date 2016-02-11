@@ -3,4 +3,4 @@ build
 .idea
 *.log
 *.log.gz
-places-near-geo-performance-tests.*
+places.*
