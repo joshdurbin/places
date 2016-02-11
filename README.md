@@ -83,3 +83,14 @@ A sample insertion load test:
 
 `siege --concurrent=250 -H 'Content-Type: application/json' -f places_insert_loadtest_urls.txt --reps=once --quiet`
 
+-----------------------------
+
+Caveats:
+
+Mac OS X has only 16K ports available that won't be released until socket TIME_WAIT is passed. The default timeout for TIME_WAIT is 15 seconds. Consider reducing in case of available port bottleneck.
+
+You can check whether this is a problem with netstat:
+
+Issue: `sysctl net.inet.tcp.msl` to get the current value of `net.inet.tcp.msl`.
+Issue: `sudo sysctl -w net.inet.tcp.msl=100` to set the value of `net.inet.tcp.msl` to `100`.
+
