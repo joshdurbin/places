@@ -81,5 +81,5 @@ A sample query load test:
 
 A sample insertion load test:
 
-`siege --concurrent=250 -H 'Content-Type: application/json' -f places_insert_loadtest_urls.txt --benchmark`
+`siege --concurrent=250 -H 'Content-Type: application/json' -f places_insert_loadtest_urls.txt --reps=once --quiet`
 
