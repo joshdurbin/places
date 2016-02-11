@@ -3,4 +3,4 @@ build
 .idea
 *.log
 *.log.gz
-bayarea-places.*
+places-near-geo-performance-tests.*

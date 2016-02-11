@@ -1,7 +1,7 @@
 buildscript {
   repositories {
     jcenter()
-  } 
+  }
   dependencies {
     classpath 'io.ratpack:ratpack-gradle:1.1.1'
     classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.2'
@@ -20,12 +20,20 @@ dependencies {
 
   compile ratpack.dependency('rx')
 
-  compile 'com.rethinkdb:rethinkdb-driver:2.2-beta-1'
+  // elasticsearch
   compile 'org.elasticsearch:elasticsearch:2.1.1'
+
+  // mongo
   compile 'org.mongodb:mongo-java-driver:3.2.0'
   compile 'org.mongodb:mongodb-driver-rx:1.2.0'
+
+  // redis
   compile 'biz.paluch.redis:lettuce:4.1.Final'
 
+  // rethink
+  compile 'com.rethinkdb:rethinkdb-driver:2.2-beta-1'
+
+  // async logging
   runtime 'org.apache.logging.log4j:log4j-slf4j-impl:2.2'
   runtime 'org.apache.logging.log4j:log4j-api:2.2'
   runtime 'org.apache.logging.log4j:log4j-core:2.2'
