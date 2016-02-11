@@ -92,5 +92,6 @@ Mac OS X has only 16K ports available that won't be released until socket TIME_W
 You can check whether this is a problem with netstat:
 
 Issue: `sysctl net.inet.tcp.msl` to get the current value of `net.inet.tcp.msl`.
+
 Issue: `sudo sysctl -w net.inet.tcp.msl=100` to set the value of `net.inet.tcp.msl` to `100`.
 
