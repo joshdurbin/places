@@ -5,10 +5,10 @@ This project intends to leverage the recommended implementation path for geospat
 places of interest (POIs) backed by various datastores. The test data set contains POIs only for the San Francisco Bay Area.
 The Ratpack and RxJava powered API allows for the insertion and query of POIs.
 
-POST operations to the '/places' end point insert a single record into the backing datastore (see below for an example record).
+POST operations to the `/places` end point insert a single record into the backing datastore (see below for an example record).
 
-GET operations to '/places' w/ the point and radius information will query the backing datastore. The expected structure of the query
-  endpoint is '/places/$latitude/$longitude/$radius' w/ a radius in meters.
+GET operations to `/places` w/ the point and radius information will query the backing datastore. The expected structure of the query
+  endpoint is `/places/$latitude/$longitude/$radius` w/ a radius in meters.
 
 The available backing datastores are:
 
@@ -16,19 +16,14 @@ The available backing datastores are:
 2. Redis (3.2 beta)
 3. Elasticsearch
 4. RethinkDB
-5. PostgreSQL w/postgis (coming, see [add-dynamo_postgis_couchbase](https://github.com/joshdurbin/places/tree/add-dynamo_postgis_couchbase) branch)
-6. AWS DynamoDB (coming, see [add-dynamo_postgis_couchbase](https://github.com/joshdurbin/places/tree/add-dynamo_postgis_couchbase) branch)
-7. Couchase (coming, see [add-dynamo_postgis_couchbase](https://github.com/joshdurbin/places/tree/add-dynamo_postgis_couchbase) branch)
 
 -----------------------------
 
-Testing:
+Data:
 
-All the aforementioned datastores are implemented and thus their dependencies are delivered, required for compilation. However, only one datastore service
-stack is loaded when the application loads. This is controlled by the [global:datastoreTarget](https://github.com/joshdurbin/places/blob/master/src/ratpack/application.yaml) attribute in the shipped base
-config. Valid options for this config are in the `Datastore` enum found in the [GlobalConfig.groovy](https://github.com/joshdurbin/places/blob/master/src/main/groovy/io/durbs/places/GlobalConfig.groovy) class.
-
------------------------------
+The data includes the name, address details, and relevant category information for each entry. There are a little more
+than 650,000 entries in the supplied, test data set. The data set and conversion scripts can be found in the [data](https://github.com/joshdurbin/places/tree/data)
+branch. The data set itself is tar.gz'ed
 
 Sample record:
 
@@ -53,3 +48,26 @@ Sample record:
   "longitude": -122.432868
 }
 ```
+
+-----------------------------
+
+Load Test:
+
+The [data](https://github.com/joshdurbin/places/tree/data) branch also has a script, [GenerateLoadTestScripts.groovy](https://github.com/joshdurbin/places/blob/data/GenerateLoadTestScripts.groovy)
+which is capabale of reading the data set and generating two files:
+
+1. `places_query_loadtest_urls.txt` - represents a query matching each point (lat, long pair) in the original data set with
+ a random distance of [25-50-100-250-500-100].
+2.  `places_insert_loadtest_urls.txt` - represents the actual record payloads for insertion to the API.
+
+These files are intended for consumption by [siege](https://www.joedog.org/siege-home/), a command line load testing
+application. It's straightforward usage is detailed below...
+
+A sample query load test:
+
+`siege --concurrent=1000 -f places_query_loadtest_urls.txt --benchmark -t60S --quiet`
+
+A sample insertion load test:
+
+`siege --concurrent=250 -H 'Content-Type: application/json' -f places_insert_loadtest_urls.txt --benchmark`
+
