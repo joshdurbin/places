@@ -31,7 +31,7 @@ dependencies {
   compile 'biz.paluch.redis:lettuce:4.1.Final'
 
   // rethink
-  compile 'com.rethinkdb:rethinkdb-driver:2.2-beta-1'
+  compile 'com.rethinkdb:rethinkdb-driver:2.2-beta-2'
 
   // async logging
   runtime 'org.apache.logging.log4j:log4j-slf4j-impl:2.2'
