@@ -24,7 +24,7 @@ Requirements:
 1. Install the latest version of Java 8 JDK
 2. Install the latest version of [Groovy](http://www.groovy-lang.org/)
 3. Install the latest version of [Gradle](http://gradle.org/)
-4. Install [siege](https://www.joedog.org/siege-home/), a command line load testing tool.
+4. Install [siege](https://www.joedog.org/siege-home/), a command line load testing tool. (presumably via brew: `brew install siege`)
 
 Note: Unless your OS has up-to-date packages for Groovy, Gradle, etc... I recommend installing Java 8 and leveraging [sdkman](http://sdkman.io/)
 for the installation of the other JVM-related tools.
@@ -87,11 +87,18 @@ A sample insertion load test:
 
 Caveats:
 
-Mac OS X has only 16K ports available that won't be released until socket TIME_WAIT is passed. The default timeout for TIME_WAIT is 15 seconds. Consider reducing in case of available port bottleneck.
+Take note of the caveats mentioned when installing siege. If many connection resets are observed at siege, especially under relatively light lode, the OS level TIME_WAIT timeout might need tweaked. Note the caveat when you install siege via brew...
+
+```
+Mac OS X has only 16K ports available that won't be released until socket
+TIME_WAIT is passed. The default timeout for TIME_WAIT is 15 seconds.
+Consider reducing in case of available port bottleneck.
 
 You can check whether this is a problem with netstat:
 
-Issue: `sysctl net.inet.tcp.msl` to get the current value of `net.inet.tcp.msl`.
+    # sysctl net.inet.tcp.msl
+    net.inet.tcp.msl: 15000
 
-Issue: `sudo sysctl -w net.inet.tcp.msl=100` to set the value of `net.inet.tcp.msl` to `100`.
-
+    # sudo sysctl -w net.inet.tcp.msl=1000
+    net.inet.tcp.msl: 15000 -> 1000
+```
