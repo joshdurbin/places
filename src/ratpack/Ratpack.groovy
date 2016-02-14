@@ -30,7 +30,7 @@ ratpack {
 
     if (globalConfig.datastoreTarget == GlobalConfig.Datastore.rethink) {
       module RethinkModule
-    } else if (globalConfig.datastoreTarget == GlobalConfig.Datastore.elasticsearch) {
+    } else if (globalConfig.datastoreTarget == GlobalConfig.Datastore.elastic) {
       module ElasticsearchModule
     } else if (globalConfig.datastoreTarget == GlobalConfig.Datastore.mongo) {
       module MongoModule
