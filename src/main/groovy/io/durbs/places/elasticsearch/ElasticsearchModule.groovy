@@ -7,7 +7,6 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.durbs.places.PlaceService
 import io.durbs.places.RESTChain
-import io.durbs.places.mongo.MongoPlaceService
 import org.elasticsearch.client.Client
 import org.elasticsearch.client.transport.TransportClient
 import org.elasticsearch.common.transport.InetSocketTransportAddress
@@ -22,7 +21,7 @@ class ElasticsearchModule extends AbstractModule {
   @Override
   protected void configure() {
 
-    bind(PlaceService).to(MongoPlaceService)
+    bind(PlaceService).to(ElasticsearchPlaceService)
     bind(RESTChain)
   }
 
