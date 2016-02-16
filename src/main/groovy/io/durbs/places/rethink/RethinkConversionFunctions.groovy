@@ -10,18 +10,17 @@ class RethinkConversionFunctions {
 
   static Func1 MAP_DOCUMENT_TO_PLACE = { final Map rootDocument ->
 
-    final Map placeDocument = rootDocument.get('doc') as Map
-    final Map locationDocument = placeDocument.get('location') as Map
+    final Map locationDocument = rootDocument.get('location') as Map
 
-    new Place(id: placeDocument.get('id'),
-      name: placeDocument.get('name'),
-      address: placeDocument.get('address'),
-      city: placeDocument.get('city'),
-      state: placeDocument.get('state'),
-      zipCode: placeDocument.get('zipCode'),
-      telephoneNumber: placeDocument.get('telephoneNumber'),
-      categories: placeDocument.get('categories') as List,
-      neighborhoods: placeDocument.get('neighborhoods') as List,
+    new Place(id: rootDocument.get('id'),
+      name: rootDocument.get('name'),
+      address: rootDocument.get('address'),
+      city: rootDocument.get('city'),
+      state: rootDocument.get('state'),
+      zipCode: rootDocument.get('zipCode'),
+      telephoneNumber: rootDocument.get('telephoneNumber'),
+      categories: rootDocument.get('categories') as List,
+      neighborhoods: rootDocument.get('neighborhoods') as List,
       latitude: (locationDocument.get('coordinates') as List).last(),
       longitude: (locationDocument.get('coordinates') as List).first())
   } as Func1

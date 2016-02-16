@@ -5,6 +5,7 @@ import com.google.inject.Singleton
 import com.lambdaworks.redis.GeoCoordinates
 import com.lambdaworks.redis.GeoWithin
 import com.rethinkdb.RethinkDB
+import com.rethinkdb.gen.ast.GetIntersecting
 import com.rethinkdb.gen.ast.GetNearest
 import com.rethinkdb.net.Connection
 import groovy.transform.CompileStatic
@@ -52,10 +53,10 @@ class RethinkPlaceService implements PlaceService {
   @Override
   Observable<Place> getPlaces(final Double latitude, final Double longitude, final Double searchRadius) {
 
-    final GetNearest getNearestCommand = rethinkDB.table('places')
-      .getNearest(rethinkDB.point(longitude, latitude))
-      .optArg('index', 'location')
-      .optArg('max_dist', searchRadius)
+    final GetIntersecting getIntersectingCommand = rethinkDB.table('places')
+      .getIntersecting(
+        rethinkDB.circle(rethinkDB.array(longitude, latitude), searchRadius)
+      ).optArg('index', 'location')
 
     Blocking.get {
 
@@ -65,7 +66,7 @@ class RethinkPlaceService implements PlaceService {
       try {
 
         connection = connectionBuilder.connect()
-        result = getNearestCommand.run(connection) as List
+        result = getIntersectingCommand.run(connection) as List
 
       } finally {
 
