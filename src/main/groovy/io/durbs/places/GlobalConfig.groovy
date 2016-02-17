@@ -14,5 +14,5 @@ class GlobalConfig {
   Long resultSetSize
   Datastore datastoreTarget
 
-  enum Datastore { elastic, mongo, redis, rethink }
+  enum Datastore { elastic, mongo, redis, rethink, rtree }
 }

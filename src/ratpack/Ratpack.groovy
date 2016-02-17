@@ -6,6 +6,7 @@ import io.durbs.places.elasticsearch.ElasticsearchModule
 import io.durbs.places.mongo.MongoModule
 import io.durbs.places.redis.RedisModule
 import io.durbs.places.rethink.RethinkModule
+import io.durbs.places.rtree.RTreeModule
 import ratpack.config.ConfigData
 import ratpack.rx.RxRatpack
 
@@ -36,6 +37,8 @@ ratpack {
       module MongoModule
     } else if (globalConfig.datastoreTarget == GlobalConfig.Datastore.redis) {
       module RedisModule
+    } else if (globalConfig.datastoreTarget == GlobalConfig.Datastore.rtree) {
+      module RTreeModule
     }
 
     // BIND JACKSON OBJECT MAPPER THAT IGNORES NULL AND EMPTY VALUES

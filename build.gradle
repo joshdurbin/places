@@ -33,6 +33,12 @@ dependencies {
   // rethink
   compile 'com.rethinkdb:rethinkdb-driver:2.2-beta-2'
 
+  // in memory
+  compile 'ch.hsr:geohash:1.3.0'
+  compile 'com.github.davidmoten:rtree:0.7.4'
+  compile 'com.github.davidmoten:grumpy-core:0.2.3'
+  compile 'com.vividsolutions:jts-core:1.14.0'
+
   // async logging
   runtime 'org.apache.logging.log4j:log4j-slf4j-impl:2.2'
   runtime 'org.apache.logging.log4j:log4j-api:2.2'

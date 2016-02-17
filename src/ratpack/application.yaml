@@ -15,8 +15,13 @@ rethink:
   port: 28015
   db: places
   table: places
+rtree:
+  star: true
+  minChildren: 44
+  maxChildren: 128
+  geoHashBitPrecision: 32
 global:
   defaultSearchRadius: 1
   maxAllowableSearchRadius: 10000
   resultSetSize: 100
-  datastoreTarget: mongo
+  datastoreTarget: rtree
