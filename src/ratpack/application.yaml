@@ -16,6 +16,7 @@ rethink:
   db: places
   table: places
   numOfVertices: 8
+  indexKey: location
 rtree:
   star: true
   minChildren: 44

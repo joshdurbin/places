@@ -74,10 +74,10 @@ class RethinkModule extends AbstractModule {
             rethinkDB.db(rethinkConfig.db).tableCreate(rethinkConfig.table).run(connection)
           }
 
-          if (!(rethinkDB.db(rethinkConfig.db).table(rethinkConfig.table).indexList().run(connection) as List<String>).contains('location')) {
+          if (!(rethinkDB.db(rethinkConfig.db).table(rethinkConfig.table).indexList().run(connection) as List<String>).contains(rethinkConfig.indexKey)) {
 
             log.info("Creating Rethink index 'location' in table '${rethinkConfig.table}' in DB '${rethinkConfig.db}'")
-            rethinkDB.db(rethinkConfig.db).table(rethinkConfig.table).indexCreate('location').optArg('geo', true).run(connection)
+            rethinkDB.db(rethinkConfig.db).table(rethinkConfig.table).indexCreate(rethinkConfig.indexKey).optArg('geo', true).run(connection)
           }
 
         } finally {

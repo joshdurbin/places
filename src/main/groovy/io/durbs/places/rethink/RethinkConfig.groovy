@@ -14,4 +14,5 @@ class RethinkConfig {
   String db
   String table
   Integer numOfVertices
+  String indexKey
 }

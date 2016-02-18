@@ -64,7 +64,7 @@ class RethinkPlaceService implements PlaceService {
     final GetIntersecting getIntersectingCommand = rethinkDB.table('places')
       .getIntersecting(
         rethinkDB.circle(rethinkDB.array(longitude, latitude), searchRadius).optArg('num_vertices', rethinkConfig.numOfVertices)
-      ).optArg('index', 'location')
+      ).optArg('index', rethinkConfig.indexKey)
 
     Blocking.get {
 
