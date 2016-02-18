@@ -20,8 +20,6 @@ import ratpack.exec.Blocking
 import rx.Observable
 import rx.functions.Func1
 
-import java.util.concurrent.atomic.AtomicReference
-
 @Singleton
 @CompileStatic
 @Slf4j
@@ -30,7 +28,7 @@ class RTreePlaceService implements PlaceService {
   final GlobalConfig globalConfig
   final RTreeConfig rTreeConfig
 
-  final AtomicReference<RTree<Place, Point>> inMemoryRTree
+  RTree<Place, Point> rTree
 
   @Inject
   RTreePlaceService(final GlobalConfig globalConfig, final RTreeConfig rTreeConfig) {
@@ -44,7 +42,7 @@ class RTreePlaceService implements PlaceService {
       rTreeBuilder = rTreeBuilder.star()
     }
 
-    inMemoryRTree = new AtomicReference(rTreeBuilder.create())
+    rTree = rTreeBuilder.create()
   }
 
   @Override
@@ -52,11 +50,9 @@ class RTreePlaceService implements PlaceService {
 
     Blocking.get {
 
-      final RTree<Place, Point> treeWithInsertedPlace = inMemoryRTree.get().add(place, Geometries.pointGeographic(place.longitude, place.latitude))
-
-      inMemoryRTree.set(treeWithInsertedPlace)
-
-      treeWithInsertedPlace
+      synchronized (rTree) {
+        rTree = rTree.add(place, Geometries.pointGeographic(place.longitude, place.latitude))
+      }
 
     }.observe()
     .map( { final RTree<Place, Point> tree ->
@@ -68,7 +64,7 @@ class RTreePlaceService implements PlaceService {
   @Override
   Observable<Place> getPlaces(final Double latitude, final Double longitude, final Double searchRadius) {
 
-    search(inMemoryRTree.get(), Geometries.pointGeographic(longitude, latitude), searchRadius / 1000)
+    search(rTree, Geometries.pointGeographic(longitude, latitude), searchRadius / 1000)
       .map( { final Entry<Place, Point> entry ->
 
       entry.value()
@@ -81,7 +77,7 @@ class RTreePlaceService implements PlaceService {
 
     final Point queryPoint = Geometries.pointGeographic(longitude, latitude)
 
-    search(inMemoryRTree.get(), queryPoint, searchRadius / 1000)
+    search(rTree, queryPoint, searchRadius / 1000)
       .map( { final Entry<Place, Point> entry ->
 
       final Place place = entry.value()
