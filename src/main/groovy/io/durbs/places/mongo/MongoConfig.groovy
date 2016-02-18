@@ -12,4 +12,5 @@ class MongoConfig {
   String collection
   String db
   String uri
+  String indexName
 }

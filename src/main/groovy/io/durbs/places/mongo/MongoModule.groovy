@@ -5,7 +5,9 @@ import com.google.inject.Provides
 import com.google.inject.Singleton
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClient
+import com.mongodb.MongoClientURI
 import com.mongodb.async.client.MongoClientSettings
+import com.mongodb.client.model.IndexOptions
 import com.mongodb.connection.ClusterSettings
 import com.mongodb.connection.ConnectionPoolSettings
 import com.mongodb.connection.ServerSettings
@@ -17,9 +19,12 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.durbs.places.PlaceService
 import io.durbs.places.RESTChain
+import org.bson.Document
 import org.bson.codecs.configuration.CodecRegistries
 import org.bson.codecs.configuration.CodecRegistry
 import ratpack.config.ConfigData
+import ratpack.server.Service
+import ratpack.server.StartEvent
 
 @CompileStatic
 @Slf4j
@@ -59,6 +64,38 @@ class MongoModule extends AbstractModule {
       .build()
 
     MongoClients.create(mongoClientSettings).getDatabase(mongoConfig.db)
+  }
+
+  @Provides
+  @Singleton
+  public Service setup(final MongoConfig mongoConfig) {
+
+    new Service() {
+
+      @Override
+      void onStart(StartEvent event) throws Exception {
+
+        final MongoClient mongoClient = new MongoClient(new MongoClientURI(mongoConfig.uri))
+
+        if (!mongoClient.listDatabaseNames().contains(mongoConfig.db)) {
+
+          log.info("Creating Mongo DB '${mongoConfig.db}'")
+          mongoClient.getDatabase(mongoConfig.db)
+        }
+
+        if (!mongoClient.getDatabase(mongoConfig.db).listCollectionNames().contains(mongoConfig.collection)) {
+
+          log.info("Creating Mongo collection '${mongoConfig.collection}' in DB '${mongoConfig.db}'")
+          mongoClient.getDatabase(mongoConfig.db).createCollection(mongoConfig.collection)
+        }
+
+        if (mongoClient.getDatabase('places').getCollection('places').listIndexes().findAll { Document index -> index.name == mongoConfig.indexName }.empty) {
+
+          log.info("Creating Mongo index '${mongoConfig.indexName}' in collection '${mongoConfig.collection}' in DB '${mongoConfig.db}'")
+          mongoClient.getDatabase(mongoConfig.db).getCollection(mongoConfig.collection).createIndex(new Document('loc', '2dsphere'), new IndexOptions(name: mongoConfig.indexName))
+        }
+      }
+    }
   }
 
 }
