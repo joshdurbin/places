@@ -13,4 +13,5 @@ class RethinkConfig {
   Integer port
   String db
   String table
+  Integer numOfVertices
 }

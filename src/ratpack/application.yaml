@@ -15,6 +15,7 @@ rethink:
   port: 28015
   db: places
   table: places
+  numOfVertices: 8
 rtree:
   star: true
   minChildren: 44

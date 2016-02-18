@@ -6,10 +6,10 @@ import com.lambdaworks.redis.GeoCoordinates
 import com.lambdaworks.redis.GeoWithin
 import com.rethinkdb.RethinkDB
 import com.rethinkdb.gen.ast.GetIntersecting
-import com.rethinkdb.gen.ast.GetNearest
 import com.rethinkdb.net.Connection
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import io.durbs.places.GlobalConfig
 import io.durbs.places.Place
 import io.durbs.places.PlaceService
 import ratpack.exec.Blocking
@@ -26,6 +26,12 @@ class RethinkPlaceService implements PlaceService {
 
   @Inject
   RethinkDB rethinkDB
+
+  @Inject
+  GlobalConfig globalConfig
+
+  @Inject
+  RethinkConfig rethinkConfig
 
   @Override
   Observable<Integer> insertPlace(final Place place) {
@@ -53,9 +59,11 @@ class RethinkPlaceService implements PlaceService {
   @Override
   Observable<Place> getPlaces(final Double latitude, final Double longitude, final Double searchRadius) {
 
+
+
     final GetIntersecting getIntersectingCommand = rethinkDB.table('places')
       .getIntersecting(
-        rethinkDB.circle(rethinkDB.array(longitude, latitude), searchRadius)
+        rethinkDB.circle(rethinkDB.array(longitude, latitude), searchRadius).optArg('num_vertices', rethinkConfig.numOfVertices)
       ).optArg('index', 'location')
 
     Blocking.get {
@@ -66,7 +74,7 @@ class RethinkPlaceService implements PlaceService {
       try {
 
         connection = connectionBuilder.connect()
-        result = getIntersectingCommand.run(connection) as List
+        result = getIntersectingCommand.limit(globalConfig.resultSetSize as Integer).run(connection) as List
 
       } finally {
 
