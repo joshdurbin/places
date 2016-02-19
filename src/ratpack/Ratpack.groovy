@@ -14,11 +14,6 @@ import static ratpack.groovy.Groovy.ratpack
 
 ratpack {
 
-  serverConfig {
-
-    development false
-  }
-
   bindings {
 
     RxRatpack.initialize()
