@@ -39,6 +39,15 @@ class RESTChain extends GroovyChainAction {
       }
     }
 
+    get('count') {
+
+      placeService.getNumberOfPlaces()
+        .subscribe { final Integer numberOfPlaces ->
+
+        render Jackson.json(numberOfPlaces)
+      }
+    }
+
     get(':latitude/:longitude/:radius') {
 
       final Double latitude = pathTokens['latitude'] as Double

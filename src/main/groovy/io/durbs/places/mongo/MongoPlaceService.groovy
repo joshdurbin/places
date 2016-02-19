@@ -79,4 +79,13 @@ class MongoPlaceService implements PlaceService {
     .bindExec()
   }
 
+  @Override
+  Observable<Integer> getNumberOfPlaces() {
+
+    mongoDatabase.getCollection(mongoConfig.collection).count()
+    .map({ final Long count ->
+      count as Integer
+    } as Func1)
+    .bindExec()
+  }
 }

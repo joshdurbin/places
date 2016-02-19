@@ -8,6 +8,8 @@ import groovy.util.logging.Slf4j
 import io.durbs.places.GlobalConfig
 import io.durbs.places.Place
 import io.durbs.places.PlaceService
+import org.elasticsearch.action.count.CountRequestBuilder
+import org.elasticsearch.action.count.CountResponse
 import org.elasticsearch.action.index.IndexRequest
 import org.elasticsearch.action.index.IndexResponse
 import org.elasticsearch.action.search.SearchRequestBuilder
@@ -41,6 +43,7 @@ class ElasticsearchPlaceService implements PlaceService {
 
       indexResponse.created ? 1 : 0
     } as Func1)
+    .bindExec()
   }
 
   @Override
@@ -60,7 +63,8 @@ class ElasticsearchPlaceService implements PlaceService {
 
       Observable.from(response.hits.hits)
     } as Func1)
-      .map(ElasticsearchConversionFunctions.MAP_SEARCH_HIT_TO_PLACE)
+    .map(ElasticsearchConversionFunctions.MAP_SEARCH_HIT_TO_PLACE)
+    .bindExec()
   }
 
   @Override
@@ -68,4 +72,19 @@ class ElasticsearchPlaceService implements PlaceService {
     return null
   }
 
+  @Override
+  Observable<Integer> getNumberOfPlaces() {
+
+    final CountRequestBuilder builder = elasticSearchClient
+      .prepareCount(elasticsearchConfig.index)
+      .setTypes(elasticsearchConfig.type)
+
+    Observable.from(builder.execute())
+      .map( { final CountResponse countResponse ->
+
+      countResponse.count as Integer
+
+    } as Func1)
+    .bindExec()
+  }
 }

@@ -27,4 +27,4 @@ global:
   defaultSearchRadius: 1
   maxAllowableSearchRadius: 10000
   resultSetSize: 100
-  datastoreTarget: mongo
+  datastoreTarget: elastic

@@ -25,9 +25,9 @@ class RethinkConversionFunctions {
       longitude: (locationDocument.get('coordinates') as List).first())
   } as Func1
 
-  static Insert CREATE_INSERT_COMMAND_FOR_PLACE(RethinkDB rethinkDB, Place place) {
+  static Insert CREATE_INSERT_COMMAND_FOR_PLACE(final RethinkDB rethinkDB, final String tableName, final Place place) {
 
-    rethinkDB.table('places')
+    rethinkDB.table(tableName)
       .insert(rethinkDB.hashMap('name', place.name)
       .with('address', place.address)
       .with('city', place.city)

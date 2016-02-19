@@ -68,4 +68,14 @@ class RedisPlaceService implements PlaceService {
     ).bindExec()
   }
 
+  @Override
+  Observable<Integer> getNumberOfPlaces() {
+
+    redisPlaceCommands.zcard(redisConfig.geoSetKey)
+      .map( { final Long cardinality ->
+
+      cardinality as Integer
+    } as Func1)
+    .bindExec()
+  }
 }

@@ -5,6 +5,7 @@ import com.google.inject.Singleton
 import com.lambdaworks.redis.GeoCoordinates
 import com.lambdaworks.redis.GeoWithin
 import com.rethinkdb.RethinkDB
+import com.rethinkdb.gen.ast.Count
 import com.rethinkdb.gen.ast.GetIntersecting
 import com.rethinkdb.net.Connection
 import groovy.transform.CompileStatic
@@ -44,7 +45,7 @@ class RethinkPlaceService implements PlaceService {
       try {
 
         connection = connectionBuilder.connect()
-        operationResult = RethinkConversionFunctions.CREATE_INSERT_COMMAND_FOR_PLACE(rethinkDB, place).run(connection) as Map
+        operationResult = RethinkConversionFunctions.CREATE_INSERT_COMMAND_FOR_PLACE(rethinkDB, rethinkConfig.table, place).run(connection) as Map
 
       } finally {
 
@@ -59,9 +60,7 @@ class RethinkPlaceService implements PlaceService {
   @Override
   Observable<Place> getPlaces(final Double latitude, final Double longitude, final Double searchRadius) {
 
-
-
-    final GetIntersecting getIntersectingCommand = rethinkDB.table('places')
+    final GetIntersecting getIntersectingCommand = rethinkDB.table(rethinkConfig.table)
       .getIntersecting(
         rethinkDB.circle(rethinkDB.array(longitude, latitude), searchRadius).optArg('num_vertices', rethinkConfig.numOfVertices)
       ).optArg('index', rethinkConfig.indexKey)
@@ -96,5 +95,30 @@ class RethinkPlaceService implements PlaceService {
       new GeoWithin<Place>(place, 0.0 as Double, 0L, new GeoCoordinates(place.latitude, place.longitude))
     } as Func1)
       .bindExec()
+  }
+
+  @Override
+  Observable<Integer> getNumberOfPlaces() {
+
+    final Count countCommand = rethinkDB.table(rethinkConfig.table).count()
+
+    Blocking.get {
+
+      final Connection connection
+      final Integer count
+
+      try {
+
+        connection = connectionBuilder.connect()
+        count = countCommand.run(connection) as Integer
+
+      } finally {
+
+        connection?.close()
+      }
+
+      count
+
+    }.observe()
   }
 }

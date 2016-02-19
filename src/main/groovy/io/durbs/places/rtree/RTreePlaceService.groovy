@@ -87,6 +87,16 @@ class RTreePlaceService implements PlaceService {
     .bindExec()
   }
 
+  @Override
+  Observable<Integer> getNumberOfPlaces() {
+
+    Blocking.get {
+
+      rTree.size()
+
+    }.observe()
+  }
+
   public static Observable<Entry<Place, Point>> search(final RTree<Place, Point> tree, final Point lonLat, final double distanceKm) {
 
     final Position from = Position.create(lonLat.y(), lonLat.x())
