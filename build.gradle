@@ -21,7 +21,7 @@ dependencies {
   compile ratpack.dependency('rx')
 
   // elasticsearch
-  compile 'org.elasticsearch:elasticsearch:2.1.1'
+  compile 'org.elasticsearch:elasticsearch:2.2.0'
 
   // mongo
   compile 'org.mongodb:mongo-java-driver:3.2.2'
@@ -31,7 +31,7 @@ dependencies {
   compile 'biz.paluch.redis:lettuce:4.1.Final'
 
   // rethink
-  compile 'com.rethinkdb:rethinkdb-driver:2.2-beta-1'
+  compile 'com.rethinkdb:rethinkdb-driver:2.2-beta-5'
 
   // in memory
   compile 'ch.hsr:geohash:1.3.0'
