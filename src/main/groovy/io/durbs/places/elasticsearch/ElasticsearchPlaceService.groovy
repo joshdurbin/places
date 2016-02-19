@@ -10,7 +10,6 @@ import io.durbs.places.Place
 import io.durbs.places.PlaceService
 import org.elasticsearch.action.index.IndexRequest
 import org.elasticsearch.action.index.IndexResponse
-import org.elasticsearch.action.search.SearchRequest
 import org.elasticsearch.action.search.SearchRequestBuilder
 import org.elasticsearch.action.search.SearchResponse
 import org.elasticsearch.client.Client
@@ -47,8 +46,6 @@ class ElasticsearchPlaceService implements PlaceService {
   @Override
   Observable<Place> getPlaces(final Double latitude, final Double longitude, final Double searchRadius) {
 
-    final String query = "{ \"query\" : { \"match_all\" : {} }, \"filter\" : { \"geo_distance\" : { \"distance\" : \"${searchRadius}m\", \"location\" : { \"lat\" : ${latitude}, \"lon\" : ${longitude} } } } }"
-
     final SearchRequestBuilder builder = elasticSearchClient
       .prepareSearch(elasticsearchConfig.index)
       .setTypes(elasticsearchConfig.type)
@@ -58,8 +55,7 @@ class ElasticsearchPlaceService implements PlaceService {
         .lon(longitude))
       .setSize(globalConfig.resultSetSize as Integer)
 
-    Observable.from(elasticSearchClient.search(new SearchRequest(elasticsearchConfig.index).types(elasticsearchConfig.type).source(query)))
-//    Observable.from(builder.execute())
+    Observable.from(builder.execute())
       .flatMap({ final SearchResponse response ->
 
       Observable.from(response.hits.hits)
