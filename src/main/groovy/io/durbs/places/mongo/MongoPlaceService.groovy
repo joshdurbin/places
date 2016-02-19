@@ -4,6 +4,7 @@ import com.google.inject.Inject
 import com.google.inject.Singleton
 import com.lambdaworks.redis.GeoCoordinates
 import com.lambdaworks.redis.GeoWithin
+import com.mongodb.QueryOperators
 import com.mongodb.rx.client.MongoDatabase
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -41,12 +42,12 @@ class MongoPlaceService implements PlaceService {
   Observable<Place> getPlaces(final Double latitude, final Double longitude, final Double searchRadius) {
 
     final Document bsonFilter = new Document('loc',
-      new Document('$near',
+      new Document(QueryOperators.NEAR,
         new Document('$geometry',
           new Document('type', 'Point')
             .append('coordinates', [longitude, latitude])
         )
-          .append('$maxDistance', searchRadius)
+          .append(QueryOperators.MAX_DISTANCE, searchRadius)
           .append('$limit', globalConfig.resultSetSize)
         )
     )

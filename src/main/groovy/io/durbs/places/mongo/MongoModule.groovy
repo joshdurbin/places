@@ -75,24 +75,41 @@ class MongoModule extends AbstractModule {
       @Override
       void onStart(StartEvent event) throws Exception {
 
-        final MongoClient mongoClient = new MongoClient(new MongoClientURI(mongoConfig.uri))
+        MongoClient mongoClient
 
-        if (!mongoClient.listDatabaseNames().contains(mongoConfig.db)) {
+        try {
 
-          log.info("Creating Mongo DB '${mongoConfig.db}'")
-          mongoClient.getDatabase(mongoConfig.db)
-        }
+          // OPEN A BLOCKING CONNECTION
+          mongoClient = new MongoClient(new MongoClientURI(mongoConfig.uri))
 
-        if (!mongoClient.getDatabase(mongoConfig.db).listCollectionNames().contains(mongoConfig.collection)) {
+          if (!mongoClient.listDatabaseNames().contains(mongoConfig.db)) {
 
-          log.info("Creating Mongo collection '${mongoConfig.collection}' in DB '${mongoConfig.db}'")
-          mongoClient.getDatabase(mongoConfig.db).createCollection(mongoConfig.collection)
-        }
+            log.info("Creating Mongo DB '${mongoConfig.db}'")
 
-        if (mongoClient.getDatabase('places').getCollection('places').listIndexes().findAll { Document index -> index.name == mongoConfig.indexName }.empty) {
+            // GET IMPLICITLY CREATES THE DB
+            mongoClient.getDatabase(mongoConfig.db)
+          }
 
-          log.info("Creating Mongo index '${mongoConfig.indexName}' in collection '${mongoConfig.collection}' in DB '${mongoConfig.db}'")
-          mongoClient.getDatabase(mongoConfig.db).getCollection(mongoConfig.collection).createIndex(new Document('loc', '2dsphere'), new IndexOptions(name: mongoConfig.indexName))
+          if (!mongoClient.getDatabase(mongoConfig.db).listCollectionNames().contains(mongoConfig.collection)) {
+
+            log.info("Creating Mongo collection '${mongoConfig.collection}' in DB '${mongoConfig.db}'")
+            mongoClient.getDatabase(mongoConfig.db)
+              .createCollection(mongoConfig.collection)
+          }
+
+          if (mongoClient.getDatabase('places').getCollection('places').listIndexes().findAll { Document index -> index.name == mongoConfig.indexName }.empty) {
+
+            log.info("Creating Mongo index '${mongoConfig.indexName}' in collection '${mongoConfig.collection}' in DB '${mongoConfig.db}'")
+
+            mongoClient.getDatabase(mongoConfig.db)
+              .getCollection(mongoConfig.collection)
+              .createIndex(
+              new Document('loc', '2dsphere'), new IndexOptions(name: mongoConfig.indexName))
+          }
+
+        } finally {
+
+          mongoClient?.close()
         }
       }
     }
