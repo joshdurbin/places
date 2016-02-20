@@ -10,7 +10,7 @@ import io.durbs.places.Place
 import io.durbs.places.PlaceService
 import org.elasticsearch.action.count.CountRequestBuilder
 import org.elasticsearch.action.count.CountResponse
-import org.elasticsearch.action.index.IndexRequest
+import org.elasticsearch.action.index.IndexRequestBuilder
 import org.elasticsearch.action.index.IndexResponse
 import org.elasticsearch.action.search.SearchRequestBuilder
 import org.elasticsearch.action.search.SearchResponse
@@ -38,8 +38,13 @@ class ElasticsearchPlaceService implements PlaceService {
   @Override
   Observable<Integer> insertPlace(final Place place) {
 
-    Observable.from(elasticSearchClient.index(new IndexRequest(elasticsearchConfig.index, elasticsearchConfig.type).source(ElasticsearchConversionFunctions.CREATE_OBJECT_BUILDER_FOR_PLACE(place))))
-      .map({ IndexResponse indexResponse ->
+    final IndexRequestBuilder builder = elasticSearchClient
+      .prepareIndex(elasticsearchConfig.index, elasticsearchConfig.type)
+      .setSource(ElasticsearchConversionFunctions.CREATE_OBJECT_BUILDER_FOR_PLACE(place))
+
+    // CONVERT THE FUTURE TO OBSERVABLE STREAM, IN WHICH ONE ITEM IS EMITTED : INDEX RESPONSE
+    Observable.from(builder.execute())
+      .map({ final IndexResponse indexResponse ->
 
       indexResponse.created ? 1 : 0
     } as Func1)
@@ -58,9 +63,11 @@ class ElasticsearchPlaceService implements PlaceService {
         .lon(longitude))
       .setSize(globalConfig.resultSetSize as Integer)
 
+    // CONVERT THE FUTURE TO OBSERVABLE STREAM, IN WHICH ONE ITEM IS EMITTED : SEARCH RESPONSE
     Observable.from(builder.execute())
       .flatMap({ final SearchResponse response ->
 
+      // EMIT A NEW STREAM OF SEARCH HIT
       Observable.from(response.hits.hits)
     } as Func1)
     .map(ElasticsearchConversionFunctions.MAP_SEARCH_HIT_TO_PLACE)
@@ -79,6 +86,7 @@ class ElasticsearchPlaceService implements PlaceService {
       .prepareCount(elasticsearchConfig.index)
       .setTypes(elasticsearchConfig.type)
 
+    // CONVERT THE FUTURE TO OBSERVABLE STREAM, IN WHICH ONE ITEM IS EMITTED : COUNT REQUEST BUILDER
     Observable.from(builder.execute())
       .map( { final CountResponse countResponse ->
 
