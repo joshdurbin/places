@@ -16,9 +16,10 @@ import groovy.util.logging.Slf4j
 import io.durbs.places.GlobalConfig
 import io.durbs.places.Place
 import io.durbs.places.PlaceService
-import ratpack.exec.Blocking
 import rx.Observable
+import rx.Subscriber
 import rx.functions.Func1
+import rx.subjects.PublishSubject
 
 @Singleton
 @CompileStatic
@@ -28,7 +29,8 @@ class RTreePlaceService implements PlaceService {
   final GlobalConfig globalConfig
   final RTreeConfig rTreeConfig
 
-  RTree<Place, Point> rTree
+  final PublishSubject<Entry<Place,Point>> subject
+  volatile RTree<Place,Point> tree
 
   @Inject
   RTreePlaceService(final GlobalConfig globalConfig, final RTreeConfig rTreeConfig) {
@@ -42,29 +44,46 @@ class RTreePlaceService implements PlaceService {
       rTreeBuilder = rTreeBuilder.star()
     }
 
-    rTree = rTreeBuilder.create()
+    subject = PublishSubject.create()
+    subject.subscribe(new Subscriber<Entry<Place,Point>>() {
+
+      @Override
+      void onCompleted() {
+
+      }
+
+      @Override
+      void onError(Throwable e) {
+
+        log.error(e.getMessage(), e)
+      }
+
+      @Override
+      void onNext(final Entry<Place, Point> entry) {
+
+        log.debug("Adding place w/ name '${entry.value().name}' to tree with coordinates [${entry.value().latitude},${entry.value().longitude}]")
+        tree = tree.add(entry)
+      }
+    })
+
+    tree = rTreeBuilder.create()
   }
 
   @Override
   Observable<Integer> insertPlace(final Place place) {
 
-    Blocking.get {
+    subject.onNext(new Entry<Place, Point>(place, Geometries.pointGeographic(place.longitude, place.latitude)))
 
-      synchronized (rTree) {
-        rTree = rTree.add(place, Geometries.pointGeographic(place.longitude, place.latitude))
-      }
+    Observable.defer({
 
-    }.observe()
-    .map( { final RTree<Place, Point> tree ->
-
-      tree.size()
+      Observable.just(tree.size())
     }).bindExec()
   }
 
   @Override
   Observable<Place> getPlaces(final Double latitude, final Double longitude, final Double searchRadius) {
 
-    search(rTree, Geometries.pointGeographic(longitude, latitude), searchRadius / 1000)
+    search(tree, Geometries.pointGeographic(longitude, latitude), searchRadius / 1000)
       .map( { final Entry<Place, Point> entry ->
 
       entry.value()
@@ -77,7 +96,7 @@ class RTreePlaceService implements PlaceService {
 
     final Point queryPoint = Geometries.pointGeographic(longitude, latitude)
 
-    search(rTree, queryPoint, searchRadius / 1000)
+    search(tree, queryPoint, searchRadius / 1000)
       .map( { final Entry<Place, Point> entry ->
 
       final Place place = entry.value()
@@ -90,11 +109,8 @@ class RTreePlaceService implements PlaceService {
   @Override
   Observable<Integer> getNumberOfPlaces() {
 
-    Blocking.get {
-
-      rTree.size()
-
-    }.observe()
+    Observable.just(tree.size())
+      .bindExec()
   }
 
   public static Observable<Entry<Place, Point>> search(final RTree<Place, Point> tree, final Point lonLat, final double distanceKm) {
