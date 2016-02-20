@@ -109,8 +109,10 @@ class RTreePlaceService implements PlaceService {
   @Override
   Observable<Integer> getNumberOfPlaces() {
 
-    Observable.just(tree.size())
-      .bindExec()
+    Observable.defer({
+
+      Observable.just(tree.size())
+    }).bindExec()
   }
 
   public static Observable<Entry<Place, Point>> search(final RTree<Place, Point> tree, final Point lonLat, final double distanceKm) {
