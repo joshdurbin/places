@@ -6,7 +6,8 @@ import com.lambdaworks.redis.GeoCoordinates
 import com.lambdaworks.redis.GeoWithin
 import com.rethinkdb.RethinkDB
 import com.rethinkdb.gen.ast.Count
-import com.rethinkdb.gen.ast.GetIntersecting
+import com.rethinkdb.gen.ast.Insert
+import com.rethinkdb.gen.ast.Limit
 import com.rethinkdb.net.Connection
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -37,6 +38,9 @@ class RethinkPlaceService implements PlaceService {
   @Override
   Observable<Integer> insertPlace(final Place place) {
 
+    // CONSTRUCT COMMAND OUTSIDE BLOCKING THREAD, MINIMIZE BLOCKING THREAD TO IO USAGE
+    final Insert insertCommand = RethinkConversionFunctions.CREATE_INSERT_COMMAND_FOR_PLACE(rethinkDB, rethinkConfig.table, place)
+
     Blocking.get {
 
       final Connection connection
@@ -45,7 +49,7 @@ class RethinkPlaceService implements PlaceService {
       try {
 
         connection = connectionBuilder.connect()
-        operationResult = RethinkConversionFunctions.CREATE_INSERT_COMMAND_FOR_PLACE(rethinkDB, rethinkConfig.table, place).run(connection) as Map
+        operationResult = insertCommand.run(connection) as Map
 
       } finally {
 
@@ -60,10 +64,13 @@ class RethinkPlaceService implements PlaceService {
   @Override
   Observable<Place> getPlaces(final Double latitude, final Double longitude, final Double searchRadius) {
 
-    final GetIntersecting getIntersectingCommand = rethinkDB.table(rethinkConfig.table)
+    // CONSTRUCT COMMAND OUTSIDE BLOCKING THREAD, MINIMIZE BLOCKING THREAD TO IO USAGE
+    final Limit getIntersectingCommand = rethinkDB.table(rethinkConfig.table)
       .getIntersecting(
-        rethinkDB.circle(rethinkDB.array(longitude, latitude), searchRadius).optArg('num_vertices', rethinkConfig.numOfVertices)
-      ).optArg('index', rethinkConfig.indexKey)
+        rethinkDB.circle(rethinkDB.array(longitude, latitude), searchRadius)
+          .optArg('num_vertices', rethinkConfig.numOfVertices))
+      .optArg('index', rethinkConfig.indexKey)
+      .limit(globalConfig.resultSetSize as Integer)
 
     Blocking.get {
 
@@ -73,7 +80,7 @@ class RethinkPlaceService implements PlaceService {
       try {
 
         connection = connectionBuilder.connect()
-        result = getIntersectingCommand.limit(globalConfig.resultSetSize as Integer).run(connection) as List
+        result = getIntersectingCommand.run(connection) as List
 
       } finally {
 
