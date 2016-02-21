@@ -20,11 +20,11 @@ rethink:
   indexKey: location
 rtree:
   star: true
-  minChildren: 44
-  maxChildren: 128
+  minChildren: 2
+  maxChildren: 4
   geoHashBitPrecision: 32
 global:
-  defaultSearchRadius: 1
-  maxAllowableSearchRadius: 10000
+  defaultSearchRadius: 175
+  maxAllowableSearchRadius: 1000
   resultSetSize: 100
   datastoreTarget: rtree
