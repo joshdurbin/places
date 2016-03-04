@@ -13,4 +13,5 @@ class ElasticsearchConfig {
   String type
   String hostname
   Integer hostport
+  String geoIndexTypeHintJSON
 }

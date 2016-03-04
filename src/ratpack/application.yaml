@@ -3,6 +3,7 @@ elastic:
   hostport: 9300
   index: places
   type: place
+  geoIndexTypeHintJSON: '{ "place": { "properties": { "location": { "type": "geo_point" } } } }'
 mongo:
   collection: places
   db: places
@@ -27,4 +28,4 @@ global:
   defaultSearchRadius: 175
   maxAllowableSearchRadius: 1000
   resultSetSize: 100
-  datastoreTarget: rtree
+  datastoreTarget: elastic
