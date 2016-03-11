@@ -2,7 +2,6 @@ package io.durbs.places
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import com.lambdaworks.redis.GeoWithin
 import groovy.util.logging.Slf4j
 import ratpack.groovy.handling.GroovyChainAction
 import ratpack.jackson.Jackson
@@ -62,25 +61,11 @@ class RESTChain extends GroovyChainAction {
         queryRadius = globalConfig.defaultSearchRadius
       }
 
-      final Boolean withDistance = request.queryParams.containsKey('distance')
+      placeService.getPlaces(latitude, longitude, queryRadius)
+        .toList()
+        .subscribe { List<Place> places ->
 
-      if (withDistance) {
-
-        placeService.getPlacesWithDistance(latitude, longitude, queryRadius)
-          .toList()
-          .subscribe { List<GeoWithin<Place>> places ->
-
-          render Jackson.json(places)
-        }
-
-      } else {
-
-        placeService.getPlaces(latitude, longitude, queryRadius)
-          .toList()
-          .subscribe { List<Place> places ->
-
-          render Jackson.json(places)
-        }
+        render Jackson.json(places)
       }
     }
   }

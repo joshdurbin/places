@@ -2,8 +2,6 @@ package io.durbs.places.mongo
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import com.lambdaworks.redis.GeoCoordinates
-import com.lambdaworks.redis.GeoWithin
 import com.mongodb.QueryOperators
 import com.mongodb.rx.client.MongoDatabase
 import groovy.transform.CompileStatic
@@ -57,27 +55,6 @@ class MongoPlaceService implements PlaceService {
       .limit(globalConfig.resultSetSize as Integer)
       .toObservable()
       .bindExec()
-  }
-
-  @Override
-  Observable<GeoWithin<Place>> getPlacesWithDistance(final Double latitude, final Double longitude, final Double searchRadius) {
-
-    final Document bsonCommand = new Document('geoNear', mongoConfig.collection)
-      .append('spherical', true)
-      .append('limit', globalConfig.resultSetSize)
-      .append('maxDistance', searchRadius)
-      .append('near', new Document('type', 'point').append('coordinates', [ longitude, latitude ]))
-    
-    mongoDatabase.runCommand(bsonCommand)
-      .flatMap({ Document document ->
-
-      Observable.from(document.get('results'))
-    } as Func1)
-      .map({ Document document ->
-
-      new GeoWithin<Place>(new Place(), 0.0 as Double, 0L, new GeoCoordinates(123, 456))
-    } as Func1)
-    .bindExec()
   }
 
   @Override
