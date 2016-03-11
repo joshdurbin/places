@@ -1,0 +1,18 @@
+{
+  "name": "places",
+  "description": "A REST API containing Bay Area points of interest or places",
+  "keywords": [
+    "groovy",
+    "ratpack",
+    "rxjava",
+    "mongo",
+    "rxmongo"
+  ],
+  "addons": [
+    "mongohq:ssd_1g_elastic"
+  ],
+  "env": {
+    "BUILDPACK_URL": "https://github.com/heroku/heroku-buildpack-gradle",
+    "JAVA_OPTS": "-Xmx384m -Xss512k -XX:+UseCompressedOops"
+  }
+}

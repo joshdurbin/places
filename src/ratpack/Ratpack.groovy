@@ -2,11 +2,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.durbs.places.RESTChain
 import io.durbs.places.GlobalConfig
-import io.durbs.places.elasticsearch.ElasticsearchModule
 import io.durbs.places.mongo.MongoModule
-import io.durbs.places.redis.RedisModule
-import io.durbs.places.rethink.RethinkModule
-import io.durbs.places.rtree.RTreeModule
 import ratpack.config.ConfigData
 import ratpack.rx.RxRatpack
 
@@ -29,18 +25,7 @@ ratpack {
     // LOCAL GLOBAL CONFIG USED FOR MODULE LOADING BELOW
     final GlobalConfig globalConfig = configData.get(GlobalConfig.CONFIG_ROOT, GlobalConfig)
     bindInstance(GlobalConfig, globalConfig)
-
-    if (globalConfig.datastoreTarget == GlobalConfig.Datastore.rethink) {
-      module RethinkModule
-    } else if (globalConfig.datastoreTarget == GlobalConfig.Datastore.elastic) {
-      module ElasticsearchModule
-    } else if (globalConfig.datastoreTarget == GlobalConfig.Datastore.mongo) {
-      module MongoModule
-    } else if (globalConfig.datastoreTarget == GlobalConfig.Datastore.redis) {
-      module RedisModule
-    } else if (globalConfig.datastoreTarget == GlobalConfig.Datastore.rtree) {
-      module RTreeModule
-    }
+    module MongoModule
 
     // BIND JACKSON OBJECT MAPPER THAT IGNORES NULL AND EMPTY VALUES
     bindInstance(ObjectMapper, new ObjectMapper()

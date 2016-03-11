@@ -1,31 +1,9 @@
-elastic:
-  hostname: localhost
-  hostport: 9300
-  index: places
-  type: place
-  geoIndexTypeHintJSON: '{ "place": { "properties": { "location": { "type": "geo_point" } } } }'
 mongo:
   collection: places
   db: places
   uri: mongodb://localhost/places
   indexName: loc_2dsphere
-redis:
-  uri: redis://localhost
-  geoSetKey: places
-rethink:
-  hostname: localhost
-  port: 28015
-  db: places
-  table: places
-  numOfVertices: 8
-  indexKey: location
-rtree:
-  star: true
-  minChildren: 2
-  maxChildren: 4
-  geoHashBitPrecision: 32
 global:
   defaultSearchRadius: 175
   maxAllowableSearchRadius: 1000
   resultSetSize: 100
-  datastoreTarget: elastic

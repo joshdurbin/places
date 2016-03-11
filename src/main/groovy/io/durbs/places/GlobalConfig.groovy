@@ -12,7 +12,4 @@ class GlobalConfig {
   Double defaultSearchRadius
   Double maxAllowableSearchRadius
   Long resultSetSize
-  Datastore datastoreTarget
-
-  enum Datastore { elastic, mongo, redis, rethink, rtree }
 }
