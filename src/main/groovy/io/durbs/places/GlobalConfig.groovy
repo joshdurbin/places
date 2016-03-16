@@ -11,5 +11,6 @@ class GlobalConfig {
 
   Double defaultSearchRadius
   Double maxAllowableSearchRadius
-  Long resultSetSize
+  Integer defaultResultSize
+  Integer maxResultSize
 }

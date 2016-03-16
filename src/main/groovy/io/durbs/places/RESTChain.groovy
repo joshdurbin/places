@@ -61,11 +61,40 @@ class RESTChain extends GroovyChainAction {
         queryRadius = globalConfig.defaultSearchRadius
       }
 
-      placeService.getPlaces(latitude, longitude, queryRadius)
-        .toList()
-        .subscribe { List<Place> places ->
+      final Integer resultSize
+      if (request.queryParams.containsKey('limit')
+        && ((request.queryParams.get('limit') as Integer) > globalConfig.maxResultSize)) {
 
-        render Jackson.json(places)
+        resultSize = globalConfig.defaultResultSize
+
+      } else if (request.queryParams.containsKey('limit')
+        && (request.queryParams.get('limit') as Integer) <= globalConfig.maxResultSize) {
+
+        resultSize = request.queryParams.get('limit') as Integer
+
+      } else {
+        resultSize = globalConfig.defaultResultSize
+      }
+
+      final Boolean withDistance = request.queryParams.containsKey('distance')
+
+      if (withDistance) {
+
+        placeService.getPlacesWithDistance(latitude, longitude, queryRadius, resultSize)
+          .toList()
+          .subscribe { List<PlaceWithDistance> places ->
+
+          render Jackson.json(places)
+        }
+
+      } else {
+
+        placeService.getPlaces(latitude, longitude, queryRadius, resultSize)
+          .toList()
+          .subscribe { List<Place> places ->
+
+          render Jackson.json(places)
+        }
       }
     }
   }

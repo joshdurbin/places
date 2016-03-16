@@ -6,4 +6,5 @@ mongo:
 global:
   defaultSearchRadius: 175
   maxAllowableSearchRadius: 1000
-  resultSetSize: 100
+  defaultResultSize: 100
+  maxResultSize: 1000
